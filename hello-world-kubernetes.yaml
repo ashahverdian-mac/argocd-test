@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      appName: hello-world-nodejs
+  template:
+    metadata:
+      labels:
+        appName: hello-world-nodejs
+    spec:
+      containers:
+      - name: hello-world-container
+        image: in28min/hello-world-nodejs:0.0.2.RELEASE
+        ports:
+        - containerPort: 5000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-entrypoint
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    appName: hello-world-nodejs
+  ports:
+  - port: 5000
+    targetPort: 5000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-resource-backend
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: app-entrypoint
+                port:
+                  number: 5000
