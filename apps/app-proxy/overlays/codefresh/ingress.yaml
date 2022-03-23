@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: codefresh-cap-app-proxy
+  namespace: codefresh
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ae78db928a4cb4423ba781e1d905988e-e83e4225fdcece45.elb.us-east-2.amazonaws.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: cap-app-proxy
+            port:
+              number: 3017
+        path: /app-proxy/
+        pathType: Prefix
+status:
+  loadBalancer: {}
